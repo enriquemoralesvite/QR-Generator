@@ -1,4 +1,3 @@
-// QR Code Generator
 import QRCode from "qrcode";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -9,93 +8,75 @@ document.addEventListener("DOMContentLoaded", function () {
     const botonGenerar = document.getElementById("botonGenerar");
     const contenedorQR = document.getElementById("qr");
     const botonDescargar = document.getElementById("botonDescargar");
+    const botonColor = document.getElementById("botonColor");
 
-    let tipoQR = "link"; 
-    let qrActual = ""; 
+    const tiposQR = {
+        texto: { placeholder: "Ingrese el texto aquí ejemplo: Grupo 5 - Nomada Digital", type: "text" },
+        email: { placeholder: "Ingrese el mail aquí ejemplo: usuario@ejemplo.com", type: "email" },
+        link: { placeholder: "Ingrese la url aquí ejemplo: https://www.ejemplo.com", type: "url" }
+    };
 
-    function cambiarTipoQR(tipo, placeholder, inputType) {
-        tipoQR = tipo;
-        entrada.placeholder = placeholder;
-        entrada.type = inputType;
-        limpiarSeleccion();
-        document.getElementById(tipo).classList.add("bg-sky-500");
-    }
+    let tipoQR = "texto";
+    let qrColor = "#000000";
+    let contenidoQRActual = "";
 
-    function limpiarSeleccion() {
-        [botonText, botonEmail, botonLink].forEach((boton) => {
-            boton.classList.remove("bg-sky-500");
-        });
-    }
+    // Inicialización
+    entrada.placeholder = tiposQR[tipoQR].placeholder;
+    entrada.type = tiposQR[tipoQR].type;
+    botonText.classList.add("bg-sky-500");
+    botonColor.querySelector("i").style.color = qrColor;
 
-    botonText.addEventListener("click", function () {
-        cambiarTipoQR("texto", "Escriba su texto aquí", "text");
-    });
-
-    botonEmail.addEventListener("click", function () {
-        cambiarTipoQR("email", "usuario@ejemplo.com", "email");
-    });
-
-    botonLink.addEventListener("click", function () {
-        cambiarTipoQR("link", "https://www.ejemplo.com", "url");
-    });
-
-    
-    botonGenerar.addEventListener("click", function () {
-        let valor = entrada.value.trim();
-        if (valor === "") {
-            alert("Por favor, ingrese un valor válido.");
-            return;
-        }
-
-        let contenidoQR = "";
-        switch (tipoQR) {
-            case "texto":
-                contenidoQR = valor;
-                break;
-            case "email":
-                contenidoQR = "mailto:" + valor;
-                break;
-            case "link":
-                contenidoQR = valor.startsWith("http") ? valor : "https://" + valor;
-                break;
-        }
-
-        
-        contenedorQR.innerHTML = "";
-
-        QRCode.toDataURL(contenidoQR, { width: 230, margin: 2 }, function (err, url) {
-            if (err) {
-                console.error("Error generando el QR:", err);
-                return;
-            }
-
-            
+    // Función para generar QR
+    function generarQR(contenido) {
+        QRCode.toDataURL(contenido, { 
+            width: 230, 
+            margin: 2,
+            color: { dark: qrColor, light: "#ffffff" }
+        }, (err, url) => {
+            if (err) return console.error("Error generando el QR:", err);
+            contenedorQR.innerHTML = `<img src="${url}" class="w-60 h-60 rounded-md">`;
             qrActual = url;
+        });
+    }
 
-            
-            let img = document.createElement("img");
-            img.src = qrActual;
-            img.classList.add("w-60", "h-60", "rounded-md");
-            contenedorQR.appendChild(img);
-
-            
-            entrada.value = "";
+    // Event Listeners 
+    Object.entries(tiposQR).forEach(([tipo, config]) => {
+        document.getElementById(tipo).addEventListener("click", () => {
+            tipoQR = tipo;
+            entrada.placeholder = config.placeholder;
+            entrada.type = config.type;
+            document.querySelectorAll(".generador__boton").forEach(b => b.classList.remove("bg-sky-500"));
+            document.getElementById(tipo).classList.add("bg-sky-500");
         });
     });
 
-    
-    botonDescargar.addEventListener("click", function () {
-        if (!qrActual) {
-            alert("No hay un código QR para descargar.");
-            return;
-        }
+    botonColor.addEventListener("click", () => {
+        const colorInput = document.createElement("input");
+        colorInput.type = "color";
+        colorInput.value = qrColor;
+        colorInput.addEventListener("change", function() {
+            qrColor = this.value;
+            botonColor.querySelector("i").style.color = qrColor;
+            if (contenidoQRActual) generarQR(contenidoQRActual);
+        });
+        colorInput.click();
+    });
 
-        let link = document.createElement("a");
+    botonGenerar.addEventListener("click", () => {
+        const valor = entrada.value.trim();
+        if (!valor) return alert("Por favor, ingrese un valor válido.");
+        
+        contenidoQRActual = tipoQR === "email" ? `mailto:${valor}` :
+                           tipoQR === "link" ? (valor.startsWith("http") ? valor : `https://${valor}`) :
+                           valor;
+        generarQR(contenidoQRActual);
+    });
+
+    botonDescargar.addEventListener("click", () => {
+        if (!qrActual) return alert("No hay un código QR para descargar.");
+        const link = document.createElement("a");
         link.href = qrActual;
         link.download = "codigoQR.png";
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
     });
 });
-// QR Code Generator

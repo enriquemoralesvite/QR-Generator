@@ -37,7 +37,10 @@
         <div class="qr flex flex-col justify-center items-center shadow-md shadow-black rounded-md py-8 w-full md:w-1/3 gap-4">
             <div id="qr" class="qr__imagen w-60 h-60 bg-gray-500 flex items-center justify-center rounded-md">
             </div>
-            <button id="botonDescargar" class="qr__boton bg-red-600 text-white font-bold text-2xl px-4 py-2 rounded-md hover:bg-red-800 cursor-pointer">Descargar<i class="bi bi-download ml-4"></i></button>
+            <div class="flex justify-center gap-4"> <!-- Removed w-full -->
+                <button id="botonColor" class="qr__boton bg-blue-600 text-white font-bold text-2xl px-4 py-2 rounded-md hover:bg-blue-800 cursor-pointer">Color<i class="bi bi-palette ml-4"></i></button>
+                <button id="botonDescargar" class="qr__boton bg-red-600 text-white font-bold text-2xl px-4 py-2 rounded-md hover:bg-red-800 cursor-pointer">Descargar<i class="bi bi-download ml-4"></i></button>
+            </div>
         </div>
     </div>
     <!-- cuerpo -->
