@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let tipoQR = "texto";
     let qrColor = "#000000";
     let contenidoQRActual = "";
+    let qrActual = "";
+    
 
     // Inicialización
     entrada.placeholder = tiposQR[tipoQR].placeholder;
